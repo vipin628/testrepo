@@ -1,0 +1,1011 @@
+<%- include('./includes/header.ejs') %>
+<%- include('./includes/navbar.ejs') %>
+
+<style>
+    .new-inp div .ng-isolate-scope {
+        height: 180px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    .new-inp div .ng-isolate-scope::-webkit-scrollbar{
+        width: 8px;
+    }
+
+    .new-inp div .ng-isolate-scope::-webkit-scrollbar-track{
+        background-color: #ededed;
+    }
+
+    .new-inp div .ng-isolate-scope::-webkit-scrollbar-thumb{
+        background-color: #6AB190;
+    }
+
+    .new-inp div .ng-isolate-scope li a {
+        color: #040304;
+        font-size: 13px;
+    }
+
+    .new-inp div .ng-isolate-scope li {
+        padding: 3px 15px;
+    }
+
+    .new-inp div .ng-isolate-scope li:nth-child(2n-1) {
+        background-color: #6AB19020;
+    }
+
+    .new-inp div .ng-isolate-scope li:hover {
+        background-color: #ededed;
+        cursor: pointer !important;
+    }
+
+    .new-inp div .ng-isolate-scope li:hover a {
+        color: #424242;
+    }
+
+    .new_paginate{
+        padding: 0px 0px 10px 0px;
+    }
+
+    .new_paginate select{
+        border: 1px solid #0d6efd90;
+        border-radius: 5px;
+        padding: 2px 10px;
+    }
+
+    .new_paginate ul li a:hover{
+        background-color: #ffffff;
+    }
+
+    .new_paginate ul li:first-child a{
+        border-radius: 5px 0 0 5px;
+    }
+
+    .new_paginate ul li:last-child a{
+        border-radius: 0 5px 5px 0;
+    }
+
+    .new_paginate ul li a{
+        color: #040304;
+        text-transform: uppercase;
+        border: 1px solid #0d6efd90;
+        padding: 8px 10px;
+        font-size: 12px;
+        background-color: #f1f4ff;
+    }
+
+    @media (max-width: 380px){
+        .new_paginate ul{
+            width: 100%;
+        }
+
+        .new_paginate ul li{
+            width: 100%;
+        }
+
+        .new_paginate ul li a{
+            padding: 2px 4px;
+        }
+
+        .new_paginate select{
+            padding: 2px 4px;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    .fs-22 {font-size:22px;}
+    .pageover {background: #00000061;}
+    .btn-danger:hover {color:white!important;}
+    .modal-content {box-shadow: 2px 2px 18px 2px rgba(0,0,0,0.1);}
+    .radio + .radio {margin-left: 20px;}
+    [type="radio"]:checked,
+    [type="radio"]:not(:checked) {
+        position: absolute;
+        left: -9999px;
+    }
+    [type="radio"]:checked + label,
+    [type="radio"]:not(:checked) + label
+    {
+        position: relative;
+        padding-left: 21px;
+        cursor: pointer;
+        font-size: 16px;
+        line-height:16px;
+        display: inline-block;
+        color: #666;
+    }
+    [type="radio"]:checked + label:before,
+    [type="radio"]:not(:checked) + label:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #ddd;
+        border-radius: 100%;
+        background: #fff;
+    }
+    [type="radio"]:checked + label:after,
+    [type="radio"]:not(:checked) + label:after {
+        content: '';
+        width: 9px;
+        height: 9px;
+        background: #d53f3f;
+        position: absolute;
+        top: 4.5px;
+        left: 4.5px;
+        border-radius: 100%;
+        -webkit-transition: all 0.2s ease;
+        transition: all 0.2s ease;
+    }
+    [type="radio"]:not(:checked) + label:after {
+        opacity: 0;
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    [type="radio"]:checked + label:after {
+        opacity: 1;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+</style>
+
+<div class="col-md-12 my-container p-0" ng-app="nationxpress" ng-controller="user">
+    <section class="wrap p-3 pb-5">
+        <div class="container p-3">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="mb-3">
+                        <div class="user-btn-group">
+                            <div class="btn-group">
+                                <% if(userSession.access_level == 1){ %>
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                    data-bs-target="#newUserModal">Add New</button>
+                                <button class="btn btn-success" disabled><i class="fi fi-rr-mode-portrait"></i></button>
+                                <% } %>
+                            </div>
+
+                            <h5><strong>USER LIST</strong></h5>
+
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary" ng-click="getLedgerExport()" title="Export To CSV">
+                                    <i class="fa-solid fa-file-export"></i> Export To CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-right p-3 rounded border shadow-lg text-center bg-white">
+                        <div class="col-md-12">
+                            <div class="new_paginate">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="form-item mb-0 h-100">
+                                            <select class="w-100 h-100" ng-model="filter.searchField" style="background: #ededed;">
+                                                <option value="">--Select--</option>
+                                                <option value="name">Name</option>
+                                                <option value="URN">User ID</option>
+                                                <option value="old_id">OLD ID</option>
+                                                <option value="email">Email</option>
+                                                <option value="phone_no">Phone No</option>
+                                                <option value="pan_no">PAN No.</option>
+                                                <% if(userSession.access_level == 1){ %>
+                                                <option value="parentURN">Parent ID</option>
+                                                <% } %>
+                                                <option value="status">Status</option>
+                                            </select>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-item mb-0">
+                                            <input type="text" id="applName" ng-model="filter.searchFieldData" autocomplete="off" style="background:white;">
+                                            <label for="applName">Name/ID/Status</label>
+                                        </div>
+                                    </div>
+                                    <% if(userSession.access_level == 1){ %>
+                                    <div class="col-md-2">
+                                        <div class="form-item mb-0 h-100">
+                                            <select class="w-100 h-100" ng-model="filter.accessLevel" style="background: #ededed;">
+                                                <option value="">--Access Level--</option>
+                                                <option value="2">SMD</option>
+                                                <option value="3">Master Distributor</option>
+                                                <option value="4">Distributor</option>
+                                                <option value="5">Retailer/Agent</option>
+                                            </select>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-success" ng-click="getLedger();" title="Filter">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-5 text-right">
+                                        Entries Showing: 
+                                        <select class="" ng-model="numPerPage" ng-init="numPerPage = '25'" ng-change="getLedger()">
+                                            <option value="10" ng-selected="numPerPage == '10'">10</option>
+                                            <option value="25" ng-selected="numPerPage == '25'">25</option>
+                                            <option value="50" ng-selected="numPerPage == '50'">50</option>
+                                            <option value="100" ng-selected="numPerPage == '100'">100</option>
+                                        </select>
+                                    </div>
+                                  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="full-table">
+                            <table class="table table-bordered table-hover table-condensed">
+                                <thead class="table-warning" style="font-size: 13px;">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Display Name</th>
+                                        <th>User ID</th>
+                                        <th>OLD ID</th>
+                                        <th>Email</th>
+                                        <th>Phone No</th>
+                                        <th>PAN No.</th>
+                                        <th>Parent ID</th>
+                                        <th>Access Level</th>
+                                        <th>Status</th>
+                                        <th>--</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="font-size: 12px;">
+                                    <tr ng-repeat="x in filteredCustomers">
+                                        <td>{{count_user + $index + 1}}</td>
+                                        <td>{{x.name}}</td>
+                                        <td>{{x.URN}}</td>
+                                        <td>{{x.old_id}}</td>
+                                        <td>{{x.email}}</td>
+                                        <td>{{x.phone_no}}</td>
+                                        <td>{{x.pan_no}}</td>
+                                        <td>{{x.parentURN}}</td>
+                                        <td>{{access_level[x.access_level]}}</td>
+                                        <td>{{x.status}}</td>
+                                        <td>
+                                            <% if(userSession.access_level == 1){ %>
+                                            <a href="" class="bg-primary text-light pt-2 p-2 pb-1 rounded" title="Edit User" ng-click="show_editDetail_modal(x)"><i class="fi fi-rr-edit"></i></a>
+                                            <% } %>
+                                            <a href="" class="bg-primary text-light pt-2 p-2 pb-1 rounded" title="Commission" ng-click='get_user_commission(x)'><i class="fi fi-rr-money"></i></a>
+                                            <% if(userSession.access_level == 1){ %>
+                                            <a href="" class="bg-primary text-light pt-2 p-2 pb-1 rounded" title="Change Password" ng-click="change_password(x)"><i class="fi fi-rr-settings"></i></a>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="new_paginate mt-3">
+                            <ul uib-pagination ng-model="currentPage" total-items="lengh" max-size="maxSize"
+                                items-per-page="numPerPage" boundary-links="true"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW USER MODAL -->
+    <div class="modal pageover fade" id="newUserModal" tabindex="-1" aria-labelledby="newUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-orange">
+                    <h5 class="modal-title" id="newUserModalLabel">CREATE NEW USER</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form ng-submit="addUser()">
+                    <div class="modal-body">
+                        <div>
+                            <div class="mt-3">
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" id="displayOldId" name="old_id" ng-model="form.old_id">
+                                        <label for="displayOldId">OLD ID</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-portrait"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" id="displayName" name="name" ng-model="form.name" required>
+                                        <label for="displayName">Display Name</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-portrait"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="email" id="displayEmail" name="email" ng-model="form.email"
+                                            required>
+                                        <label for="displayEmail">Email</span></label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-envelope"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" validation="mobile" maxlength="10" id="displayPhone" ng-model="form.phone_no"
+                                            name="mobile" required>
+                                        <label for="displayPhone">Phone Number</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-smartphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" maxlength="10" validation="pan" ng-required='form.access_level == 5' id="displayName" ng-model="form.pan_no" name="pan_no_edi">
+                                        <label for="displayName">Pan Number</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-smartphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="btn-group w-100">
+                                            <div class="form-item new-inp w-100">
+                                                <input class="" type="text"
+                                                    uib-typeahead="x as x.state for x in states | filter:{state:$viewValue}"
+                                                    typeahead-show-hint="true" typeahead-min-length="0"
+                                                    typeahead-select-on-blur="true" typeahead-editable="false"
+                                                    autocomplete="off" ng-model="form.state"
+                                                    id="state" ng-required="true" placeholder="Select State"
+                                                    style="text-transform: uppercase; font-size: 14px; border-radius: 5px 0 0 5px;">
+                                                <!--                                                <label for="state">State</label>-->
+                                            </div>
+                                            <div class="form-btn">
+                                                <button class="btn btn-success" disabled>
+                                                    <i class="fi fi-rr-map-marker-home"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <div class="btn-group w-100">
+                                            <div class="form-item w-100">
+                                                <input type="text" id="displayCity" name="name" ng-model="form.city" required>
+                                                <label for="displayCity">City</label>
+                                            </div>
+                                            
+                                            <div class="form-btn">
+                                                <button class="btn btn-success" disabled>
+                                                    <i class="fi fi-rr-map-marker-home"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <div class="btn-group w-100">
+                                            <div class="form-item w-100">
+                                                <input type="text" id="displayPincode" name="name" ng-model="form.pincode" required>
+                                                <label for="displayPincode">Pin Code</label>
+                                            </div>
+                                            
+                                            <div class="form-btn">
+                                                <button class="btn btn-success" disabled>
+                                                    <i class="fi fi-rr-map-marker-home"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <select class="form-control" ng-model="form.access_level" required ng-init="form.access_level = ''">
+                                            <option disabled value='' selected>Access Level</option>
+                                            <option ng-repeat="(k, v) in access_level" ng-if="k>acc_lev" value="{{k}}">
+                                                {{v}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-sign-in"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <select class="form-control" ng-model="form.status" ng-init="form.status = 'Active'" required placeholder="Status">
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Pending">Pending</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-sign-in"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" id="displayParentId" name="parent_id" placeholder="NXPAN000001" ng-model="form.parent_id">
+                                        <label for="displayParentId">Parent Id</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-portrait"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-success active" id="home-tab" data-bs-toggle="tab"
+                                data-bs-target="#home-tab-pane" type="submit" role="tab" aria-controls="home-tab-pane"
+                                aria-selected="true">Save & Return</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- NEW USER MODAL -->
+
+    <!-- EDIT USER MODAL -->
+    <div class="modal pageover" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-orange">
+                    <h5 class="modal-title" id="editUserModalLabel">EDIT USER</h5>
+                    <button type="button" ng-click="closeModal()" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form ng-submit="editUser()">
+                    <div class="modal-body">
+                        <div>
+                            <div class="mt-3">
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" ng-model="edit.old_id" id="editOldId">
+                                        <label for="editOldId">OLD ID</span></label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-portrait"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" ng-model="edit.name" id="editName" required>
+                                        <label for="editName">Display Name</span></label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-portrait"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="email" ng-model="edit.email" id="editEmail" required>
+                                        <label for="editEmail">Email</span></label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-envelope"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" validation="mobile" maxlength="10" id="editPhone" ng-model="edit.phone_no"
+                                            name="mobile" required>
+                                        <label for="editPhone">Phone Number</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-smartphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="btn-group w-100">
+                                        <div class="form-item w-100">
+                                            <input type="text" validation="pan" maxlength="10" ng-required="edit.access_level == 5" id="pan_no" ng-model="edit.pan_no" name="pan_no">
+                                            <label for="pan_no">Pan Number</span></label>
+                                        </div>
+                                        <div class="form-btn">
+                                            <button class="btn btn-success" disabled>
+                                                <i class="fi fi-rr-smartphone"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+<!--                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <select class="form-control" name="" id="" required ng-model="edit.access_level">
+                                            <option disabled selected>Access Level</option>
+                                            <option ng-repeat="(k, v) in access_level" ng-if="k>acc_lev" value="{{k}}">{{v}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-sign-in"></i>
+                                        </button>
+                                    </div>
+                                </div>-->
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <select class="form-control" ng-model="edit.status" required placeholder="Status">
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Pending">Pending</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-sign-in"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="btn-group w-100" ng-if="edit.status == 'Inactive'">
+                                    <div class="form-item w-100">
+                                        <input type="text" ng-model="edit.remarks" id="editRemarks" ng-required="edit.status == 'Inactive'">
+                                        <label for="editRemarks">Remarks</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-edit"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="btn-group w-100">
+                                    <div class="form-item w-100">
+                                        <input type="text" id="editParentId" name="parent_id" placeholder="NXPAN000001" ng-model="edit.parent_id">
+                                        <label for="editParentId">Parent Id</label>
+                                    </div>
+                                    <div class="form-btn">
+                                        <button class="btn btn-success" disabled>
+                                            <i class="fi fi-rr-portrait"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-success active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="submit" role="tab" aria-controls="home-tab-pane" aria-selected="true">Save & Return</button>
+                            <button class="btn btn-sm btn-warning" id="disabled-tab" data-bs-toggle="tab"
+                                ng-click="closeModal()" data-bs-target="#disabled-tab-pane" type="button" role="tab"
+                                aria-controls="disabled-tab-pane" aria-selected="false">Return</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- EDIT USER MODAL -->
+    
+    <!--Commission Modal  -->
+     <div id="commission_modal" class="pageover pageover-lg">
+        <div class="pageover-backbrop"></div>
+        <div class="pageover-container" style="border-top: 6px solid #3B5998;">
+            <div class="pageover-title text-center p-2" style="box-shadow:2px 2px 18px 2px rgb(0 0 0 / 10%);">Customer/Agent Commission Management - {{user_title}} <a class="btn btn-danger btn-xs close-button btn-close" style="float:right;" ng-click="closeModal()"></a></div>
+            <div class="pageover-body">
+                <form  method="post" ng-submit="set_usrCategory()" class="" style="padding: 20px;">    
+                    <div ng-show="pkg.userSettingType == 'Manual' || pkg.usrcategory != 'None'"  class="boxed sky-form form-bordered">
+                        <div class="col-md-12">
+                            <div class="alert alert-info mb-0 text-center" style="border-radius: 10px 10px 0px 0px;">
+                                <strong>AGENT COMMISSION</strong>
+                            </div>
+                            <div class="col-md-12 text-center p-3" style="border:2px solid #cff4fc;border-radius: 0px 0px 10px 10px;">
+                                <div class="row align-items-center border p-2 rounded mb-2">
+                                    <div class="col-md-3">
+                                        Customer/Agent Share for PAN(apply mode : Physical):
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="radio mt-0">
+                                            <input type="radio" id="button1" ng-model="rds.agentcom_type" ng-checked="rds.agentcom_type == 'Default'" value="Default">
+                                            <label for="button1">Default</label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="radio mt-0">
+                                            <input type="radio" id="button2" ng-model="rds.agentcom_type" ng-checked="rds.agentcom_type == 'Manual'" value="Manual">
+                                            <label for="button2">Manual</label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="" ng-if="rds.agentcom_type == 'Default'">
+<!--                                            <b class="fs-22">{{rds.pan_commission}}</b>-->
+                                            <input class="form-control" required="tue" type="text" ng-model="rds.pan_commission" placeholder="Customer/Agent Share for PAN" disabled="true">
+                                            <!--Customer/Agent Share for Non A.C. Coaches <b>{{rds.nonac_commission}}</b><br>-->
+                                        </div>
+                                        <div class="" ng-if="rds.agentcom_type == 'Manual'">
+                                            <div class="">
+                                                <input class="form-control" required="tue" type="text" ng-model="rds.pan_commission" placeholder="Customer/Agent Share for PAN" validation="numeric" decimal="2" min-value="rds.config.pan_commission.min" max-value="rds.config.pan_commission.max">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row align-items-center border p-2 rounded mb-2">
+                                    <div class="col-md-3">
+                                        Customer/Agent Share for PAN(apply mode : Digital; card : E-PAN):
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="radio mt-0">
+                                            <input type="radio" id="physicalPan1" ng-model="de.agentcom_type" ng-checked="de.agentcom_type == 'Default'" value="Default">
+                                            <label for="physicalPan1">Default</label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="radio mt-0">
+                                            <input type="radio" id="physicalPan2" ng-model="de.agentcom_type" ng-checked="de.agentcom_type == 'Manual'" value="Manual">
+                                            <label for="physicalPan2">Manual</label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="" ng-if="de.agentcom_type == 'Default'">
+<!--                                            <b class="fs-22">{{rds.pan_commission}}</b>-->
+                                            <input class="form-control" required="tue" type="text" ng-model="de.pan_commission" placeholder="Customer/Agent Share for PAN" disabled="true">
+                                            <!--Customer/Agent Share for Non A.C. Coaches <b>{{rds.nonac_commission}}</b><br>-->
+                                        </div>
+                                        <div class="" ng-if="de.agentcom_type == 'Manual'">
+                                            <div class="">
+                                                <input class="form-control" required="tue" type="text" ng-model="de.pan_commission" placeholder="Customer/Agent Share for PAN" validation="numeric" decimal="2" min-value="de.config.pan_commission.min" max-value="de.config.pan_commission.max">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row align-items-center border p-2 rounded mb-2">
+                                    <div class="col-md-3">
+                                        Customer/Agent Share for PAN(apply mode : Digital; card : Physical):
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="radio mt-0">
+                                            <input type="radio" id="softCopy1" ng-model="dp.agentcom_type" ng-checked="dp.agentcom_type == 'Default'" value="Default">
+                                            <label for="softCopy1">Default</label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="radio mt-0">
+                                            <input type="radio" id="softCopy2" ng-model="dp.agentcom_type" ng-checked="dp.agentcom_type == 'Manual'" value="Manual">
+                                            <label for="softCopy2">Manual</label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="" ng-if="dp.agentcom_type == 'Default'">
+<!--                                            <b class="fs-22">{{rds.pan_commission}}</b>-->
+                                            <input class="form-control" required="tue" type="text" ng-model="dp.pan_commission" placeholder="Customer/Agent Share for PAN" disabled="true">
+                                            <!--Customer/Agent Share for Non A.C. Coaches <b>{{rds.nonac_commission}}</b><br>-->
+                                        </div>
+                                        <div class="" ng-if="dp.agentcom_type == 'Manual'">
+                                            <div class="">
+                                                <input class="form-control" required="tue" type="text" ng-model="dp.pan_commission" placeholder="Customer/Agent Share for PAN" validation="numeric" decimal="2" min-value="dp.config.pan_commission.min" max-value="dp.config.pan_commission.max">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 pt-2 text-center">
+                        <button type="submit" class="btn btn-primary rad-0 float-right" ng-disabled="commissionProcessing"><i class="fa fa-check"></i> OK, PROCEED</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Commission Modal  -->
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#userlist').addClass('active');
+    });
+var app = angular.module("nationxpress", ['ui.bootstrap','validation']);
+app.controller("user", function($scope, $http, $custom) {
+    $scope.states = JSON.parse('<%- JSON.stringify(state) %>');
+    // $scope.cities = [];
+
+//    $scope.getCity = function() {
+//        $http({
+//            method: "POST",
+//            url: '<?php echo base_url('getCity') ?>',
+//            data: 'state=' + $scope.form.state.state,
+//            headers: {
+//                'Content-Type': 'application/x-www-form-urlencoded'
+//            }
+//        }).then(function(res) {
+//            console.log(res.data);
+//            $scope.cities = res.data;
+//        });
+//    };
+
+//    $scope.getPincode = function() {
+//        $http({
+//            method: "POST",
+//            url: '<?php echo base_url('getPincode') ?>',
+//            data: 'city=' + $scope.form.city.city,
+//            headers: {
+//                'Content-Type': 'application/x-www-form-urlencoded'
+//            }
+//        }).then(function(res) {
+//            console.log(res.data);
+//            $scope.pincodes = res.data;
+//        });
+//    };
+
+    $scope.addUser = function() {
+        $http({
+            method: "POST",
+            url: '/addUser',
+            data: 'data=' + encodeURIComponent(JSON.stringify($scope.form)),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(function(res) {
+            $scope.response = res.data;
+            if ($scope.response.status) {
+                iziToast.success({
+                    title: 'Success',
+                    message: $scope.response.message,
+                    position: 'topRight',
+                    layout: 2
+                });
+                $scope.closeModal();
+                $scope.getLedger();
+            } else {
+                iziToast.error({
+                    title: 'Error',
+                    message: $scope.response.message,
+                    position: 'topRight',
+                    layout: 2
+                });
+            }
+        });
+
+    };
+
+    $scope.filter = {
+        currentPage: '1',
+        numPerPage: '20',
+        searchField: '',
+        searchFieldData: '',
+        accessLevel: ''
+        
+    };
+    $scope.customers = [];
+    $scope.filteredCustomers = [];
+    $scope.currentPage = 1;
+    $scope.numPerPage = 20;
+    $scope.maxSize = 9;
+    $scope.getLedger = function() {
+        $http({
+            method: "POST",
+            url: '/getUser',
+            data: 'data=' + encodeURIComponent(JSON.stringify($scope.filter)),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(function(res) {
+            console.log(res.data);
+            $scope.customers = res.data.data;
+            $scope.lengh = res.data.total;
+            $scope.acc_level = res.data.access_level;
+            $scope.filteredCustomers = $scope.customers;
+            // updateFilteredItems();
+        });
+    };
+    $scope.getLedger();
+    $scope.$watch('currentPage + numPerPage', updateFilteredItems);
+
+    function updateFilteredItems() {
+        // alert($scope.currentPage);
+        $scope.filter = {
+            currentPage: $scope.currentPage,
+            numPerPage: $scope.numPerPage,
+            searchField: $scope.filter.searchField,
+            searchFieldData: $scope.filter.searchFieldData,
+            accessLevel: $scope.filter.accessLevel
+        };
+        $scope.getLedger();
+        $scope.count_user = ($scope.currentPage - 1) * $scope.numPerPage;
+    }
+    $scope.access_level = JSON.parse('<%- JSON.stringify(access_level)%>');
+    $scope.edit = {};
+    $scope.show_editDetail_modal = function(x) {
+        $scope.edit.user_id = x.id;
+        $scope.edit.name = x.name;
+        $scope.edit.email = x.email;
+        $scope.edit.access_level = x.access_level;
+        $scope.edit.status = x.status;
+        $scope.edit.pan_no = x.pan_no;
+        $scope.edit.old_id = x.old_id;
+        $scope.edit.remarks = x.remarks;
+        $scope.edit.parent_id = x.parentURN;
+        $scope.edit.phone_no = x.phone_no;
+        //            $scope.business_target = business_target;
+        $('#editUserModal').show();
+    };
+
+    $scope.closeModal = function() {
+        $('.pageover').hide();
+    };
+    $scope.acc_lev = '<%= userSession.access_level %>';
+
+    $scope.editUser = function() {
+        $http({
+            method: "POST",
+            url: '/editUser',
+            data: 'data=' + encodeURIComponent(JSON.stringify($scope.edit)),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(function(res) {
+            $scope.response = res.data;
+            if ($scope.response.status) {
+                iziToast.success({
+                    title: 'Success',
+                    message: $scope.response.message,
+                    position: 'topRight',
+                    layout: 2
+                });
+                 $scope.closeModal();
+                 $scope.getLedger();
+//                window.location = "<?php echo base_url('user') ?>";
+            } else {
+                iziToast.error({
+                    title: 'Error',
+                    message: $scope.response.message,
+                    position: 'topRight',
+                    layout: 2
+                });
+            }
+        });
+    };
+    
+    $scope.get_user_commission = function (x) {
+    
+//        $scope.pkg = {};
+//        $scope.pkg.holdCommission =[];
+//        $scope.pkgHold ={};
+//        $scope.commissionProcessing = false;
+        $scope.user_title = x.name + ' [' + x.email + ']';
+        $http({
+            method: "POST",
+            url: '/get-user-commission',
+            data: 'user_id=' + x.id, 
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(function (res) { 
+//            $scope.pkg = res.data;
+            $scope.rds = res.data.rds;
+            $scope.de = res.data.de;
+            $scope.dp = res.data.dp;
+//            $scope.rds.config;
+            $('#commission_modal').show();
+        }); 
+    };
+    
+    $scope.set_usrCategory = function () {
+        if (confirm('Are You Sure to Add/Update this package?')) {
+            $scope.comm = {
+                rds : $scope.rds,
+                de : $scope.de,
+                dp : $scope.dp
+            };
+            $http({
+                method: "POST",
+                url:'/set-user-commission',
+                data: 'data=' + encodeURIComponent(JSON.stringify($scope.comm)),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }).then(function (res) {
+                $scope.commissionProcessing = false;
+                if (res.data.success) {
+                    if (res.data.need_approval) {
+                        iziToast.info({//show,error,success,info
+                            title: 'Settings Saved!',
+                            message: res.data.message,
+                            position: 'topCenter' // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
+                        });
+                        dataTable.draw();
+                    } else {
+                        iziToast.success({//show,error,success,info
+                            title: 'Settings Saved!',
+                            message: res.data.message,
+                            position: 'topCenter' // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
+                        });
+                        dataTable.draw();
+                    }
+                    $('#commission_modal').hide();
+                } else {
+                    iziToast.error({//show,error,success,info
+                        title: 'Error Details!',
+                        message: res.data.message,
+                        position: 'topCenter' // bottomRight, bottomLeft, topRight, topLeft, topCenter, bottomCenter, center
+                    });
+                }
+                
+            });
+        }
+    };
+    
+    $scope.getLedgerExport = function() {
+        $http({
+            method: "POST",
+            url: '/getUserExport',
+            data: 'data=' + encodeURIComponent(JSON.stringify($scope.filter)),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then(function(res) {
+            $scope.customersEx = res.data.data;
+             $scope.download($scope.customersEx, 'Users', {name: 'Display Name', old_id: 'OLD ID', URN: 'User ID',email: 'Email',phone_no: 'Phone No',pan_no: 'Pan Number',parentURN: 'Parent ID',access_level: 'Access Level',state: 'State',status : 'Status',last_login : 'Last Login',modified_date: 'Created Date',created_at: 'Modified Date'},$scope.access_level);
+        });
+    };
+    $scope.download = function (data, title, header,arrr) {
+        $custom.download1(data, title, header,arrr);
+    };
+    
+    $scope.change_password = function(x){
+        if (confirm('Are You Sure to Change Password of '+x.name + '?')) {
+            $http({
+                method: "POST",
+                url: '/changeUserPassword',
+                data: 'data=' + encodeURIComponent(JSON.stringify(x)),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(res) {
+                 $scope.response = res.data;
+                if ($scope.response.status) {
+                    iziToast.success({
+                        title: 'Success',
+                        message: $scope.response.message,
+                        position: 'topRight',
+                        layout: 2
+                    });
+//                    window.location = "<?php echo base_url('user') ?>";
+                } else {
+                    iziToast.error({
+                        title: 'Error',
+                        message: $scope.response.message,
+                        position: 'topRight',
+                        layout: 2
+                    });
+                }
+            });
+        }
+    }
+        
+        
+
+});
+</script>
+<%- include('./includes/footer.ejs') %>

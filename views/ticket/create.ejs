@@ -1,0 +1,423 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/navbar.ejs') %>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<style>
+.listing{
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.listing_div{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.border-primary-light{
+    border: 1px solid #b6d4fee8 !important;
+}
+
+.inner_list{
+    overflow-y: scroll;
+}
+</style>
+<div class="col-md-12 my-container p-0" ng-app="nationxpress" ng-controller="add_value">
+<section class="wrap p-3 pb-5">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="shadow-sm bg-white rounded">
+
+                    <div class="alert alert-primary" style="border-radius: 5px 5px 0 0; padding: 5px;">
+                        <h5 class="mb-0">TICKET DETAILS</h5>
+                    </div>
+
+                    <div class="p-3 pt-0">
+                        <div>
+                            <div class="form-item w-100">
+                                <select name="concern" required class="form-select" ng-init="form.concernType == ''" ng-model="form.concernType">
+                                    <option value="">Select</option>
+                                    <option value="Re-Traning"> Re-Traning</option>
+                                    <option value="Uploading"> Uploading</option>
+                                    <!--<option value="Surrender"> Surrender</option>-->
+                                    <option value="TECHNICAL ISSUE"> Technical Issue</option>
+                                    <option value="Update info"> Update info</option>
+                                    <option value="dep_amt">PAN Limits / Amount Added</option>
+                                    <option value="comm_related">Commission Related</option>
+                                    <option value="Other"> Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="btn-group w-100" ng-show="form.concernType == 'dep_amt'">
+                            <div class="form-item w-100">
+                                <input type="text" id="refNo" ng-init="form.reference_no=''" ng-model="form.reference_no" ng-blur="checkRefNo()"  name="reference_no" autocomplete="off" required>
+                                <label for="refNo">Reference No</label>
+                            </div>
+                        
+                            <div class="form-btn">
+                                <button type="button" class="btn btn-success" disabled>
+                                    <i class="fi fi-rr-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="btn-group w-100" ng-show="form.concernType == 'comm_related'">
+                            <div class="form-item w-100">
+                                <input type="text" id="appNo" ng-init="form.app_no=''" ng-model="form.app_no" ng-blur="checkAppNo()"  name="app_no" autocomplete="off" required>
+                                <label for="appNo">Reference/Application No</label>
+                            </div>
+                        
+                            <div class="form-btn">
+                                <button type="button" class="btn btn-success" disabled>
+                                    <i class="fi fi-rr-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="btn-group w-100" >
+                            <textarea ng-hide="form.concernType == 'dep_amt'" ng-change="countCom()" maxlength="200" ng-model="form.comment" class="form-control" rows="4" cols="90" placeholder="Write your concern Here"></textarea>
+                        </div>
+                        <span class="float-end mb-2 mt-1" ng-hide="form.concernType == 'dep_amt'">{{commentCount}}/200</span>
+                        <div ng-if="resMessage != ''">
+                            <label class="{{resClass}}"> {{resMessage}} </label>
+                        </div>
+                        <div class="">
+                            <button class="btn btn-sm btn-primary shadow form-control" ng-disabled="form.concernType == 'dep_amt'" type="button" name="button" ng-click="raiseTicket()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-8">
+                <div class="bg-light rounded">
+                    <div class="alert alert-primary d-flex align-items-center mb-1" style="border-radius: 5px 0 0 0; padding: 5px; justify-content: space-between">
+                        <h5 class="mb-0">TICKET LIST</h5>
+                        <input type="text" ng-model="filter.daterange" ng-change="getLedger()" readonly=""  ng-focus="changeDate();" name="daterange" class="form-control" value="" style="width: 33%;"/>
+                    </div>
+                    <div class="p-2 pt-0">
+                            <div class="shadow-sm alert alert-warning p-2 mb-0">
+                                <div class="listing_div" >
+                                    <div class="col-md-2">
+                                        <h5 class="mb-0"><center>Ticket No</center></h5>
+                                       
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h5 class="mb-0"><center>Concern Type</center></h5>
+                                       
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <h5 class="mb-0"><center>Reference No</center></h5>
+                                  
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <h5 class="mb-0"><center>Status</center></h5>
+                                     
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <h5 class="mb-0"><center>view more</center></h5>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <div class="">
+                        <div class="p-2 pt-0" ng-repeat="x in tickets">
+                            <div class="listing shadow-sm border-primary-light">
+                                <div class="listing_div">
+                                    <div class="col-md-2">
+                                       
+                                        <p><center>{{x.ticketNo}}</center></p>
+                                    </div>
+                                    <div class="col-md-2">
+                                       
+                                        <p><center>{{x.concern_type}}</center></p>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                       
+                                        <p><center>{{x.reference_no}}</center></p>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                       
+                                        <p><center>{{(x.status == '0'? 'Pending':(x.status == '1'? 'Resolved' : 'Not Resolved'))}}</center></p>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                       
+                                        <p><center> <a href="" class="bg-primary text-light pt-2 p-2 pb-1 rounded" title="Edit User" ng-click="show_editDetail_modal(x)"><i class="fi fi-rr-edit"></i></a></center></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- EDIT USER MODAL -->
+<div class="modal pageover" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-orange">
+                <h5 class="modal-title" id="editUserModalLabel">More Info</h5>
+                <button type="button" ng-click="closeModal()" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <form ng-submit="editUser()">
+                <div class="modal-body">
+                    <h5>Your Comment<span style="float: right"> {{your_date}}</span></h5>
+                    <p>{{ comment }}</p>
+                    <hr>
+                    <h5 ng-hide="admin_comment =='' || !admin_comment">Admin Comment <span style="float: right"> {{admin_date}}</span></h5>
+                    <p> {{admin_comment}}</p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- EDIT USER MODAL -->
+</div>
+
+<script>
+
+
+$(document).ready(function () {
+    $('#ticket').addClass('active');
+});
+var app = angular.module("nationxpress", ['ui.bootstrap']);
+app.controller("add_value", function ($scope, $http) {
+     $scope.form = {};
+    $scope.form.comment = '';
+    $scope.commentCount = $scope.form.comment.length;
+    $scope.countCom = function () {
+        $scope.commentCount = $scope.form.comment.length;
+    }
+    
+    $scope.form.reference_no = '';
+    $scope.checkRefNo = function () {
+        $http({
+            method: "POST",
+            url: '/checkRefNo',
+            data: 'reference_no=' + $scope.form.reference_no,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(function (res) {
+            console.log(res.data);
+            $scope.resClass = res.data.class;
+            $scope.resMessage = res.data.message;
+        });
+    };
+    $scope.checkAppNo = function () {
+        $http({
+            method: "POST",
+            url: '/checkAppNo',
+            data: 'app_no=' + $scope.form.app_no,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(function (res) {
+            console.log(res.data);
+            $scope.resClass = res.data.class;
+            $scope.resMessage = res.data.message;
+        });
+    };
+
+   
+    $scope.changeDate = function () {
+        $('input[name="daterange"]').daterangepicker({
+          opens: 'left'
+        }, function(start, end, label) {
+            $scope.filter.startDate = start.format('YYYY-MM-DD');
+            $scope.filter.endDate = end.format('YYYY-MM-DD');
+          console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+    };
+    
+     $(function() {
+        $('input[name="daterange"]').daterangepicker({
+          opens: 'left'
+        }, function(start, end, label) {
+            $scope.filter.startDate = start.format('YYYY-MM-DD');
+            $scope.filter.endDate = end.format('YYYY-MM-DD');
+          console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+        });
+    });
+//        $scope.changeDate();
+    $scope.raiseTicket = function () {
+        $http({
+            method: "POST",
+            url: '/raiseTicket',
+            data: 'data=' + encodeURIComponent(JSON.stringify($scope.form)),
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(function (res) {
+           $scope.response = res.data;
+            if ($scope.response.status) {
+                iziToast.success({
+                    title: 'Success',
+                    message: $scope.response.message,
+                    position: 'topRight',
+                    layout: 2
+                });
+                $scope.form = {};
+                $scope.getLedger();
+            } else {
+                iziToast.error({
+                    title: 'Error',
+                    message: $scope.response.message,
+                    position: 'topRight',
+                    layout: 2
+                });
+            }
+        });
+    };
+    
+    $scope.show_editDetail_modal = function(x) {
+        $scope.comment = x.comment;
+        $scope.admin_comment = x.admin_comment;
+        $scope.your_date = x.created_at;
+        $scope.admin_date = x.updated_at;
+//            $scope.edit.email = x.email;
+//    //        $scope.edit.access_level = x.access_level;
+//            $scope.edit.status = x.status;
+//            $scope.edit.pan_no = x.pan_no;
+//            $scope.edit.old_id = x.old_id;
+//            $scope.edit.remarks = x.remarks;
+//            $scope.edit.parent_id = x.parentURN;
+//            $scope.edit.phone_no = x.phone_no;
+//            //            $scope.business_target = business_target;
+        $('#editUserModal').show();
+    };
+    $scope.closeModal = function() {
+    $('.pageover').hide();
+};
+//        
+//        $scope.getPincode = function () {
+//            $http({
+//                method: "POST",
+//                url: '<?php echo base_url('getPincode') ?>',
+//                data: 'city=' + $scope.form.city.city,
+//                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//            }).then(function (res) {
+//                console.log(res.data);
+//                $scope.pincodes = res.data;
+//            }); 
+//        };
+//        
+//        $scope.addUser = function () {
+//            $http({
+//                method: "POST",
+//                url: '<?php echo base_url('addUser') ?>',
+//                data: 'data=' + encodeURIComponent(JSON.stringify($scope.form)),
+//                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//            }).then(function (res) {
+//                $scope.response = res.data;
+//                if ($scope.response.status) {
+//                    iziToast.success({
+//                        title: 'Success',
+//                        message: $scope.response.message,
+//                        position: 'topRight',
+//                        layout: 2
+//                    });
+//                    window.location="<?php echo base_url('user') ?>";
+//                } else {
+//                    iziToast.error({
+//                        title: 'Error',
+//                        message: $scope.response.message,
+//                        position: 'topRight',
+//                        layout: 2
+//                    });
+//                }
+//            });
+//
+//        };
+//        
+    $scope.filter = {
+        currentPage : '1',
+        numPerPage : '20',
+        searchField : '',
+        daterange : ''
+    };
+//        $scope.customers = [];
+//        $scope.filteredCustomers = [];
+//        $scope.currentPage = 1;
+//        $scope.numPerPage = 20;
+//        $scope.maxSize = 9;
+    $scope.getLedger = function () {
+        $http({
+            method: "POST",
+            url: '/getTicket',
+            data: 'data=' + encodeURIComponent(JSON.stringify($scope.filter)),
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        }).then(function (res) {
+            console.log(res.data);
+            $scope.tickets = res.data.data;
+            $scope.lengh = res.data.total;
+        });
+    };
+    $scope.getLedger();
+//        $scope.$watch('currentPage + numPerPage', updateFilteredItems);
+//        function updateFilteredItems() {
+//            // alert($scope.currentPage);
+//            $scope.filter = {
+//                currentPage : $scope.currentPage,
+//                numPerPage : $scope.numPerPage,
+//                searchField : $scope.searchField,
+//                searchFieldData : $scope.searchFieldData
+//            };
+//            $scope.getLedger();
+//            $scope.count_user = ($scope.currentPage-1)*$scope.numPerPage;
+//          }
+//        $scope.access_level = <?php echo  json_encode($this->staticvar->access_level); ?>;
+//        $scope.edit = {};
+//        $scope.show_editDetail_modal = function (x) {
+//            $scope.edit.user_id = x.id;
+//            $scope.edit.name = x.name;
+//            $scope.edit.email = x.email;
+//            $scope.edit.access_level = x.access_level;
+////            $scope.business_target = business_target;
+//            $('#editUserModal').show();
+//        };
+//        
+//         $scope.closeModal = function () {
+//            $('.pageover').hide();
+//        };
+//        $scope.acc_lev = '<?php echo $access_lev; ?>';
+//        
+//        $scope.editUser = function () {
+//            $http({
+//                method: "POST",
+//                url: '<?php echo base_url('editUser') ?>',
+//                data: 'data=' + encodeURIComponent(JSON.stringify($scope.edit)),
+//                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+//            }).then(function (res) {
+//                $scope.response = res.data;
+//                if ($scope.response.status) {
+//                    iziToast.success({
+//                        title: 'Success',
+//                        message: $scope.response.message,
+//                        position: 'topRight',
+//                        layout: 2
+//                    });
+//                    window.location="<?php echo base_url('user') ?>";
+//                } else {
+//                    iziToast.error({
+//                        title: 'Error',
+//                        message: $scope.response.message,
+//                        position: 'topRight',
+//                        layout: 2
+//                    });
+//                }
+//            });
+//        };
+    
+});
+</script>
+
+<%- include('../includes/footer.ejs') %>

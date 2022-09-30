@@ -1,0 +1,147 @@
+<%- include('./includes/header.ejs') %>
+<%- include('./includes/navbar.ejs') %>
+<section class="wrap">
+    <div class="container p-3">
+        <div class="row">
+            <div class="position-relative marquee-container d-sm-block mb-3 mt-2">
+            <div class="marquee d-flex justify-content-around">
+                <span>
+                    <b>
+                        <a href="#" class="text-light">
+                            <?php if(!empty($alert['remarks'])){
+                                echo $alert['remarks'];
+                            }
+                            else 
+                            {
+                                echo "Kindly upload the scanned PAN application documents along with photo and signature files on the same day for all generated PAN applications to avoid any objection.";
+                            }
+                                ?>
+                                                    </a>
+                    </b>
+                </span>
+            </div>
+<!--            <div class="marquee marquee2 d-flex justify-content-around">
+                <span>
+                    <b>
+                        <a href="#" class="text-light">
+                            Kindly upload the scanned PAN application documents along with photo and signature files on the same day for all generated PAN applications to avoid any objection.AS PER ITD GUIDELINES, AN E-MAIL ID/MOBILE NUMBER CANNOT BE USED MORE THAN THREE TIMES FOR PAN GENERATION.
+                        </a>
+                    </b>
+                </span>
+            </div>-->
+        </div>
+           
+        <?php if(@$access_lev == 5 || @$access_lev == 4){ ?>
+            <div class="col-lg-6">
+                <div class="account-card card p-4 shadow">
+                    <div class="account_details">
+                        <div class="account_inner">
+                            <h3>Recharge Your wallet(OFFLINE)</h3>
+                            <p><span>NAME:- </span>Earnindia consultancy private limited</p>
+                            <p><span> IFSC CODE:- </span>ICICI0006639</p>
+                            <p><span> ACCOUNT NUMBER:- </span>663905600446</p>
+                        </div>
+                        <div>
+                            <p>Add With QR Code</p>
+                            <img class="qr_code" src="<?php echo base_url(); ?>assets/images/icons/qrCode.png">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center;" class="w-100">
+                        <a href="<?php echo base_url('add-value');?>"><button class="btn btn-danger"><i class="fa-solid fa-wallet"> &nbsp;                          </i> Add Value</button></a>
+                    </div>
+                    
+<!--                    <img class="wallet_img" src="<?php echo base_url(); ?>assets/images/icons/wallet.png">-->
+                </div>
+            </div>
+            <?php if(!empty($virtual)) { ?>
+            <div class="col-lg-6">
+                <div class="account-card card p-4 shadow">
+                    <div class="account_details">
+                        <div class="account_inner">
+                            <h3>Recharge Your wallet(ONLINE)</h3>
+                            <p><span>NAME:- </span>Earn India</p>
+                            <p><span> BANK NAME:- </span>RBL BANK</p>
+                            <p><span> IFSC CODE:- </span><?=$virtual['ifsc']; ?></p>
+                            <p><span> ACCOUNT NUMBER:- </span><?=$virtual['accountNo']; ?></p>
+                        </div>
+                    </div>
+<!--                    <div style="display: flex; justify-content: center;" class="w-100">
+                        <a href="<?php echo base_url('add-value');?>"><button class="btn btn-danger"><i class="fa-solid fa-wallet"> &nbsp;                          </i> Add Value</button></a>
+                    </div>-->
+                    
+<!--                    <img class="wallet_img" src="<?php echo base_url(); ?>assets/images/icons/wallet.png">-->
+                </div>
+            </div>
+            <?php } ?>
+            
+            <div id="owl-carousel" class="owl-carousel owl-theme mt-3">
+                <div class="item shadow">
+                  <img src="<?php echo base_url();?>assets/images/slider/5.jpg" class="d-block w-100 rounded" alt="...">
+                </div>
+                <div class="item shadow">
+                  <img src="<?php echo base_url();?>assets/images/slider/6.jpg" class="d-block w-100 rounded" alt="...">
+                </div>
+                <div class="item shadow">
+                  <img src="<?php echo base_url();?>assets/m_images/slider/01.png" class="d-block w-100 rounded" alt="...">
+                </div>
+                <div class="item shadow">
+                  <img src="<?php echo base_url();?>assets/m_images/slider/02.png" class="d-block w-100 rounded" alt="...">
+                </div>
+<!--                <div class="item shadow">
+                  <img src="<?php // echo base_url();?>assets/m_images/slider/03.png" class="d-block w-100 rounded" alt="...">
+                </div>-->
+                <div class="item shadow">
+                  <img src="<?php echo base_url();?>assets/m_images/slider/04.png" class="d-block w-100 rounded" alt="...">
+                </div>
+            </div>
+            
+            <?php } ?>
+        </div>
+    </div>
+</section> 
+
+
+
+<!-- Button trigger modal -->
+<!--<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>-->
+
+<!-- Modal -->
+<!--<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <img src="<?php echo base_url(); ?>assets/images/panHang.jpg" width="100%" draggable="false">
+      </div>
+    </div>
+  </div>
+</div>-->
+
+
+
+<script type="text/javascript">
+    
+    $('#owl-carousel').owlCarousel({
+        loop: true,
+        margin: 30,
+        dots: true,
+        nav: false,
+        items: 2,
+    });
+    
+    $(window).on('load', function() {
+        $('#imageModal').modal('show');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#dashboard').addClass('active');
+    });
+</script>
+
+<%- include('./includes/footer.ejs') %>

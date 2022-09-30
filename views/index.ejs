@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+    <!-- LIVE -->
+    
+<head>
+    <title>LOGIN | NATIONXPRESS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- FLATICON CSS -->
+    <link href="assets/webfonts/uicons-regular-rounded.css" rel="stylesheet">
+    <link href="assets/webfonts/uicons-solid-rounded.css" rel="stylesheet">
+
+    <!-- BOOTSTRAP CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"> -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link type="text/css" rel="stylesheet" href="assets/css/styles.css">
+
+</head>
+
+<body class="noselect" id="top" style="background: #E2EAFF url(assets/images/panBG.jpg) center right no-repeat; background-size: cover;">
+    <div class="page_loader"></div>
+
+    <!-- Login 31 start -->
+    <div class="login-31">
+        <div class="container">
+            <div class="col-md-12">
+                <div class="row" style="display: flex; justify-content: flex-start">
+                    <div class="col-lg-6 col-sm-12 align-self-center login-box-9">
+                        <div class="col-lg-12 login-inner-form">
+                            <div class="details">
+                                <div class="clearfix">
+                                    <a href="login-31.html">
+                                        <img src="assets/images/logo.png" alt="logo" draggable="false" width="150">
+                                    </a>
+                                </div>
+                                <h5 class="text-danger"><%= msg %></h5>
+                                <h2 class="login-heading loginText">Login Into Your Account</h2>
+                                <form action="login" method="POST" class="showLogin">
+                                    <div class="form-group form-box">
+                                        <input type="URN" name="URN" class="form-control" placeholder="User ID"
+                                            aria-label="User ID">
+                                    </div>
+                                    <div class="form-group form-box">
+                                        <input type="password" name="password" class="form-control" autocomplete="off"
+                                            placeholder="Password" aria-label="Password">
+                                    </div>
+
+                                    <div class="checkbox clearfix">
+                                        <a href="javascript:forgot_password()">Forgot Password</a>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn-sm btn btn-dark w-100">Login</button>
+                                    </div>
+                                    <div class="text-start">
+                                        <p>Need Assistance: Call Us On <a href="tel:01141221111"><strong>011-4122
+                                                    1111</strong></a></p>
+                                    </div>
+                                </form>
+                                <?php if($_SERVER['REMOTE_ADDR'] == "192.168.10.188"){ ?>
+                                <form action="#" method="POST" class="resetPassword">
+                                    <div class="form-group form-box">
+                                        <input type="text" id="resetURN" name="resetURN" class="form-control" placeholder="User ID"
+                                            aria-label="User ID">
+                                    </div>
+
+                                    <div class="checkbox clearfix">
+                                        <a href="javascript:try_again()">Login Another Account?click here</a>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="button" id="sendLink" class="btn-sm btn btn-dark w-100">submit</button>
+                                    </div>
+                                    <div class="text-start">
+                                        <p>Need Assistance: Call Us On <a href="tel:01141221111"><strong>011-4122
+                                                    1111</strong></a></p>
+                                    </div>
+                                </form>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <a target="_blank" href="<?php echo base_url('term_condition'); ?>">Terms &amp; Conditions</a>
+                <a target="_blank" href="<?php echo base_url('privacy_policy'); ?>">Privacy Policy</a>
+                <a target="_blank" href="<?php echo base_url('disclaimer'); ?>">Disclaimer</a>
+            </div>
+        </div>
+    </div>
+    <!-- Login 31 end -->
+
+    <!-- Main JS -->
+    <script src="assets/js/main.js"></script>
+
+    <!-- BOOTSTRAP SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-kjU+l4N0Yf4ZOJErLsIcvOU2qSb74wXpOhqTvwVx3OElZRweTnQ6d31fXEoRD1Jy" crossorigin="anonymous"></script>
+</body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".resetPassword").hide();
+        $("#errMsg").hide();
+
+        $(document).on("click", "#sendLink", function () {
+            var dataString = "URN=" + $("#resetURN").val();
+            $.ajax({
+                url: "<?php echo base_url('sendLink'); ?>",
+                type: "post",
+                data: dataString,
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data.success == true) {
+                        
+                        $("#errMsg").show();
+                        $("#errMsg").removeClass('alert-danger');
+                        $("#errMsg").addClass('alert-success');
+                        $("#errMsg").html(data.message);
+                    }
+                    if (data.success == false)
+                    {
+                        $("#errMsg").addClass('alert-danger');
+                        $("#errMsg").removeClass('alert-success');
+                        $("#errMsg").show();
+                        $("#errMsg").html(data.message);
+//                        $("#errMsg").css('color', 'green');
+                    }
+                      setTimeout(() => {
+                          $("#errMsg").hide();
+//                            window.location.href = 'https://dmt.nationxpress.com/login'
+                        }, 3000)
+                },
+                error: function (err) {
+                    console.log(err);
+                }
+
+            });
+        });
+//        $("#captcha").attr("ondrop", "return false;");
+//        $('#captcha').on("cut copy paste", function (e) {
+//            e.preventDefault();
+        });
+    function forgot_password()
+    {
+        $(".loginText").html("Forgot Password");
+//        $(".slide-controls").hide();
+        $(".showLogin").hide();
+        $(".resetPassword").show();
+    }
+    function try_again()
+    {
+        $(".loginText").html("Login Into Your Account");
+//        $(".slide-controls").hide();
+        $(".showLogin").show();
+        $(".resetPassword").hide();
+    }
+</script>
+
+</html>
